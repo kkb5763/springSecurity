@@ -63,9 +63,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Collection<GrantedAuthority> collet = new ArrayList<GrantedAuthority>();
-		collet.add(()->{ return user.getRole();});
-		return collet;
+		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+//		collet.add(()->{ return user.getRole();});
+		user.getRoleList().forEach(r -> {
+			authorities.add(()->{ return r;});
+		});
+		return authorities;
 	}
 
 	// 리소스 서버로 부터 받는 회원정보

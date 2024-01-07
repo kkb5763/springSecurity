@@ -72,14 +72,19 @@ public class IndexController {
 		return "join";
 	}
 
-	@PostMapping("/joinProc")
-	public String joinProc(User user) {
-		System.out.println("회원가입 진행 : " + user);
-		String rawPassword = user.getPassword();
-		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-		user.setPassword(encPassword);
-		user.setRole("ROLE_USER");
-		userRepository.save(user);
-		return "redirect:/";
+	@GetMapping("/index")
+	public String home() {
+		return "index";
 	}
+
+//	@PostMapping("/joinProc")
+//	public String joinProc(User user) {
+//		System.out.println("회원가입 진행 : " + user);
+//		String rawPassword = user.getPassword();
+//		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+//		user.setPassword(encPassword);
+//		user.setRole("ROLE_USER");
+//		userRepository.save(user);
+//		return "redirect:/";
+//	}
 }
