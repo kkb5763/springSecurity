@@ -2,7 +2,6 @@ package com.kbkang.controller;
 
 import java.util.Iterator;
 
-import com.kbkang.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,18 +9,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kbkang.config.auth.PrincipalDetails;
 import com.kbkang.repository.UserRepository;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class IndexController {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepository UserRepository;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;

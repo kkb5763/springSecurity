@@ -1,10 +1,7 @@
 package com.kbkang.repository;
 
 import com.kbkang.model.Member;
-import com.kbkang.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.Optional;
 
 /**
  * 

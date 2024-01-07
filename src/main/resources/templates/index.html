@@ -11,8 +11,8 @@
 <hr/>
 <!-- 시큐리티는 x-www-form-url-encoded 타입만 인식 -->
 <form id="loginForm" action="/api/v1/login" method="post">
-	<input type="text" name="username" required/>
-	<input type="text" name="role" />
+	이름 <input type="text" name="username" required/>
+	롤   <input type="text" name="role" />
 	<button type="submit">로그인</button>
 </form>
 <script>
@@ -66,7 +66,7 @@
 <form id="jwtValidForm" action="/api/v1/jwtAuth" method="post">
 <!--	<input type="text" name="token" required/>-->
 <!--	<input type="password" name="password" />-->
-	<button type="submit">jwt_valid</button>
+	JWT 값 확인 용도 : <button type="submit">jwt_valid</button>
 </form>
 <script>
 	document.getElementById('jwtValidForm').addEventListener('submit', function(event) {
@@ -113,7 +113,7 @@
 <br />
 
 <form id="profileForm" action="/api/v1/profile" method="post">
-	<input type="text" name="role" required/>
+	입력X<input type="text" name="role" required/>
 	<!--	<input type="password" name="password" />-->
 	<button type="submit">profile_Access</button>
 </form>
@@ -149,7 +149,7 @@
 					}
 				})
 				.then(data => {
-					console.log('인증 성공:', data);
+					console.log('profileForm 성공:', data);
 					// localStorage.setItem('accessToken', data.accessToken);
 					// 여기에서 성공적으로 가입한 경우에 대한 처리를 수행
 					// window.location.href = "index";
@@ -162,11 +162,61 @@
 </script>
 <br />
 
+
+<form id="matchingForm" action="/api/v1/matching" method="post">
+	<input type="text" name="role" required/>
+	<!--	<input type="password" name="password" />-->
+	<button type="submit">profile_Access</button>
+</form>
+<script>
+	document.getElementById('matchingForm').addEventListener('submit', function(event) {
+		event.preventDefault();
+		const formData = new FormData(event.target);
+		const storedToken = localStorage.getItem("accessToken");
+		formData.set("token", storedToken);
+		const headers = new Headers();
+		headers.append("Authorization", "Bearer " + storedToken);
+		headers.append("Content-Type", "application/x-www-form-urlencoded")
+		// fetch를 사용하여 POST 요청 보내기
+		fetch(event.target.action, {
+			method: event.target.method,
+			headers: headers,
+			body: new URLSearchParams(formData).toString(),
+		})
+				.then(response => {
+					if (response.status === 302) {
+						// Redirect status code
+						// window.location.href = response.headers.get('Location');
+					} else if (!response.ok) {
+						throw new Error(`Network response was not ok: ${response.statusText}`);
+					}
+
+					const contentType = response.headers.get('content-type');
+					if (contentType && contentType.includes('application/json')) {
+						return response.json();
+					} else {
+						// JSON 형식이 아닌 경우, 텍스트로 응답을 처리
+						return response.text();
+					}
+				})
+				.then(data => {
+					console.log('matching 성공:', data);
+					// localStorage.setItem('accessToken', data.accessToken);
+					// 여기에서 성공적으로 가입한 경우에 대한 처리를 수행
+					// window.location.href = "index";
+				})
+				.catch(error => {
+					console.error('matching 실패:', error);
+					// 여기에서 실패한 경우에 대한 처리를 수행
+				});
+	});
+</script>
+<br />
+
 <h1>Social Login</h1>
 <br />
-<!-- javascript:; 는 클릭해도 반응을 없게 하는 키워드 -->
-<a href="/oauth2/authorization/google" >
-	<img src="https://pngimage.net/wp-content/uploads/2018/06/google-login-button-png-1.png"
+<a href="/oauth2/authorization/kakao" >
+	<img src=""
 		 alt="google" width="357px" height="117px">
 </a>
 <br />

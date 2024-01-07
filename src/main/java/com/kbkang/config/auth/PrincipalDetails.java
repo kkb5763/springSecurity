@@ -13,32 +13,32 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 public class PrincipalDetails implements UserDetails, OAuth2User{
 
 	private static final long serialVersionUID = 1L;
-	private User user;
+	private User User;
 	private Map<String, Object> attributes;
 
 	// 일반 시큐리티 로그인시 사용
-	public PrincipalDetails(User user) {
-		this.user = user;
+	public PrincipalDetails(User User) {
+		this.User = User;
 	}
 	
 	// OAuth2.0 로그인시 사용
-	public PrincipalDetails(User user, Map<String, Object> attributes) {
-		this.user = user;
+	public PrincipalDetails(User User, Map<String, Object> attributes) {
+		this.User = User;
 		this.attributes = attributes;
 	}
 	
 	public User getUser() {
-		return user;
+		return User;
 	}
 
 	@Override
 	public String getPassword() {
-		return user.getPassword();
+		return User.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		return user.getUsername();
+		return User.getUsername();
 	}
 
 	@Override
@@ -64,10 +64,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-//		collet.add(()->{ return user.getRole();});
-		user.getRoleList().forEach(r -> {
-			authorities.add(()->{ return r;});
-		});
+		authorities.add(()->{ return getUser().getRole();});
 		return authorities;
 	}
 
@@ -80,7 +77,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 	// User의 PrimaryKey
 	@Override
 	public String getName() {
-		return user.getId()+"";
+		return User.getUserid()+"";
 	}
 	
 }

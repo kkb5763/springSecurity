@@ -22,7 +22,7 @@ import com.kbkang.config.oauth.provider.OAuth2UserInfo;
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepository UserRepository;
 
 	// userRequest 는 code를 받아서 accessToken을 응답 받은 객체
 	@Override
@@ -57,26 +57,26 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		//System.out.println("oAuth2UserInfo.getProvider() : " + oAuth2UserInfo.getProvider());
 		//System.out.println("oAuth2UserInfo.getProviderId() : " + oAuth2UserInfo.getProviderId());
 		Optional<User> userOptional =
-				userRepository.findByProviderAndProviderId(oAuth2UserInfo.getProvider(), oAuth2UserInfo.getProviderId());
+				UserRepository.findByProviderAndProviderId(oAuth2UserInfo.getProvider(), oAuth2UserInfo.getProviderId());
 		
-		User user;
+		User User;
 		if (userOptional.isPresent()) {
-			user = userOptional.get();
+			User = userOptional.get();
 			// user가 존재하면 update 해주기
 //			user.setEmail(oAuth2UserInfo.getEmail());
-			userRepository.save(user);
+			UserRepository.save(User);
 		} else {
 			// user의 패스워드가 null이기 때문에 OAuth 유저는 일반적인 로그인을 할 수 없음.
-			user = User.builder()
+			User = com.kbkang.model.User.builder()
 					.username(oAuth2UserInfo.getProvider() + "_" + oAuth2UserInfo.getProviderId())
 //					.email(oAuth2UserInfo.getEmail())
 //					.role("ROLE_USER")
 //					.provider(oAuth2UserInfo.getProvider())
 //					.providerId(oAuth2UserInfo.getProviderId())
 					.build();
-			userRepository.save(user);
+			UserRepository.save(User);
 		}
 
-		return new PrincipalDetails(user, oAuth2User.getAttributes());
+		return new PrincipalDetails(User, oAuth2User.getAttributes());
 	}
 }

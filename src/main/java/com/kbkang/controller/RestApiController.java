@@ -9,6 +9,7 @@ import com.kbkang.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.List;
 // @CrossOrigin  // CORS 허용 
 public class RestApiController {
 	
-	private final UserRepository userRepository;
+	private final UserRepository UserRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	private final JwtProvider jwtProvider;
@@ -30,41 +31,34 @@ public class RestApiController {
 
 	// 모든 사람이 접근 가능
 	@GetMapping("home")
-	public String home() {
-		return "<h1>home</h1>";
+	public List<User> home() {
+		return UserRepository.findAll();
 	}
-	
-	// Tip : JWT를 사용하면 UserDetailsService를 호출하지 않기 때문에 @AuthenticationPrincipal 사용 불가능.
-	// 왜냐하면 @AuthenticationPrincipal은 UserDetailsService에서 리턴될 때 만들어지기 때문이다.
-	
+
 	// 유저 혹은 매니저 혹은 어드민이 접근 가능
 	@GetMapping("user")
-	public String user(Authentication authentication) {
-		PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-		System.out.println("principal : "+principal.getUser().getId());
-		System.out.println("principal : "+principal.getUser().getUsername());
-		System.out.println("principal : "+principal.getUser().getPassword());
-		
-		return "<h1>user</h1>";
+	public List<User> user() {
+		return UserRepository.findAll();
 	}
-	
+
 	// 매니저 혹은 어드민이 접근 가능
-	@GetMapping("manager/reports")
+	@GetMapping("manager/test")
 	public String reports() {
 		return "<h1>reports</h1>";
 	}
-	
+
 	// 어드민이 접근 가능
 	@GetMapping("admin/users")
 	public List<User> users(){
-		return userRepository.findAll();
+		return UserRepository.findAll();
 	}
 	
 	@PostMapping("join")
-	public String join(@RequestBody User user) {
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setRoles("ROLE"+user.getRole());
-		userRepository.save(user);
+	public String join(@RequestBody User User) {
+		User.setPassword(bCryptPasswordEncoder.encode(User.getPassword()));
+		User.setRoles("ROLE_"+ User.getRole());
+		User.setRole("ROLE_"+ User.getRole());
+		UserRepository.save(User);
 		return "회원가입완료";
 	}
 
@@ -73,7 +67,7 @@ public class RestApiController {
 											   @RequestParam("role") String role) {
 //		String token = jwtProvider.createToken(user.getUsername());
 
-		String token = jwtProvider.createToken(username+"||"+role);
+		String token = jwtProvider.createToken(username);
 
 		//db - insert (일단 maria , 나중에 redis)
 		//{accessToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxN…zODV9.nvOD2zrLKVUT13OkGjatCZXh3e_vRYKWg4MBTC8VvjU'
@@ -87,7 +81,6 @@ public class RestApiController {
 		String sample_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNzA0NjA1OTk3LCJleHAiOjE3MDU0Njk5OTd9.Yf-ZciPtEhbKpsX73vHCrSjbJRcjFynsDD9BlhuKr9w";
 		//token validation check
 		String subject = jwtProvider.getSubject(token);
-
 		boolean validResult = jwtProvider.validateToken(token);
 
 		if(validResult || sample_token.equals(token)){
@@ -98,20 +91,17 @@ public class RestApiController {
 	}
 
 	@PostMapping("/profile")
+	@Secured({"ROLE_UaaSER", "UaSER"})
 	public String profile(@RequestParam("") String token){
 		//DB -> acess token 가져오기
 //		eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNzA0NjA1OTk3LCJleHAiOjE3MDU0Njk5OTd9.Yf-ZciPtEhbKpsX73vHCrSjbJRcjFynsDD9BlhuKr9w
-		String sample_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNzA0NjA1OTk3LCJleHAiOjE3MDU0Njk5OTd9.Yf-ZciPtEhbKpsX73vHCrSjbJRcjFynsDD9BlhuKr9w";
-		//token validation check
-		String subject = jwtProvider.getSubject(token);
+		return "profile 접근 성공";
+	}
 
-		boolean validResult = jwtProvider.validateToken(token);
-
-		if(validResult || sample_token.equals(token)){
-			return "sucess_인증";
-		}else {
-			return "fail_인증";
-		}
+	@PostMapping("/matching")
+	@Secured({"ROLE_USER", "USER"})
+	public String matching(@RequestParam("") String token){
+		return "matching 접근 성공";
 	}
 }
 

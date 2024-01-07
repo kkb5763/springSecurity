@@ -1,6 +1,5 @@
 package com.kbkang.config;
 
-import com.kbkang.config.auth.PrincipalDetailsService;
 import com.kbkang.config.jwt.JwtAuthenticationFilter;
 import com.kbkang.config.jwt.JwtAuthorizationFilter;
 import com.kbkang.config.oauth.PrincipalOauth2UserService;
@@ -9,17 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
 
 @Configuration // IoC 빈(bean)을 등록
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -27,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //	@Autowired
 //	private PrincipalDetailsService principalDetailsService;
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepository UserRepository;
 	@Autowired
 	private DataSource dataSource;
 	@Bean
@@ -37,14 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CorsConfig corsConfig;
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.jdbcAuthentication()
-				.dataSource(dataSource)
-				.usersByUsernameQuery("SELECT username, password, enabled FROM member_info WHERE username=?")
-				.authoritiesByUsernameQuery("SELECT username, authority FROM authorities WHERE username=?")
-				.passwordEncoder(encodePwd());
-	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -54,18 +46,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().formLogin().disable().httpBasic().disable()
 				.addFilter(new JwtAuthenticationFilter(authenticationManager()))
-				.addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
+				.addFilter(new JwtAuthorizationFilter(authenticationManager(), UserRepository))
 		;
 		http.authorizeRequests()
 //				.formLogin().disable()
 //				.httpBasic().disable()
 				.antMatchers("/api/v1/login").permitAll()
-				.antMatchers("/api/v1/profile/**")
-				.access("hasRole('ROLE_USER')")
-				.antMatchers("/api/v1/match/**")
-				.access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-				.antMatchers("/api/v1/admin/**")
-				.access("hasRole('ROLE_ADMIN')")
+				.antMatchers("/api/v1/profile").authenticated()
+				.antMatchers("/api/v1/match/**").authenticated()
+				.antMatchers("/api/v1/admin/**").authenticated()
 
 //				.antMatchers("/user/**").authenticated()
 				// .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN') or

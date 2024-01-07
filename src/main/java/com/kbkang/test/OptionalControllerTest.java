@@ -12,7 +12,7 @@ import com.kbkang.repository.UserRepository;
 public class OptionalControllerTest {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepository UserRepository;
 	
 	@GetMapping("/test/user/{id}")
 	public User 옵셔널_유저찾기(@PathVariable int id) {
@@ -28,7 +28,7 @@ public class OptionalControllerTest {
 //				return User.builder().id(5).username("아무개").email("아무개@naver.com").build();
 //		});
 
-		User user = userRepository.findById(id)
+		User User = UserRepository.findById(id)
 				.orElseThrow(()-> {
 
 						return new NullPointerException("없어 값");
@@ -36,7 +36,7 @@ public class OptionalControllerTest {
 					
 				});
 		
-		return user;
+		return User;
 	}
 }
 

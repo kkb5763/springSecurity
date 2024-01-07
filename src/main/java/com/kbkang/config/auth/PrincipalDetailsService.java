@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 public class PrincipalDetailsService implements UserDetailsService{
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepository UserRepository;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username);
-		if(user == null) {
+		User User = UserRepository.findByUsername(username);
+		if(User == null) {
 			return null;
 		}else {
-			return new PrincipalDetails(user);
+			return new PrincipalDetails(User);
 		}
 		
 	}
